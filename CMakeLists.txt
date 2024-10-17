@@ -11,6 +11,7 @@ option(XDF_NO_SYSTEM_PUGIXML "Force use of bundled pugixml" OFF)
 set(SOURCES
     xdf.h
     xdf.cpp
+    load_xdf_to_json.cpp
     smarc/filtering.h
     smarc/filtering.c
     smarc/multi_stage.h
@@ -25,7 +26,7 @@ set(SOURCES
     smarc/stage_impl.c
 )
 
-add_library(xdf ${SOURCES})
+add_library(xdf SHARED ${SOURCES})
 
 find_package(pugixml 1.9 QUIET)
 if(TARGET pugixml AND NOT XDF_NO_SYSTEM_PUGIXML)
