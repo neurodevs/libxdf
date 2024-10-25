@@ -27,13 +27,15 @@ extern "C" char* load_xdf_to_json(const char* filename) {
         infoJson["nominal_srate"] = stream.info.nominal_srate;
         infoJson["channel_format"] = stream.info.channel_format;
 
-        streamJson["info"] = infoJson;
+        streamJson["stream_info"] = infoJson;
 
         for (size_t j = 0; j < stream.time_series.size(); j++) {
             json channelJson;
+
             for (size_t k = 0; k < stream.time_series[j].size(); k++) {
                 channelJson.push_back(stream.time_series[j][k]);
             }
+            
             streamJson["time_series"].push_back(channelJson);
         }
 
@@ -43,6 +45,21 @@ extern "C" char* load_xdf_to_json(const char* filename) {
 
         root["streams"].push_back(streamJson);
     }
+
+    const std::vector<std::pair<std::pair<std::string, double>, int>> eventMap = xdf_instance.eventMap;
+
+    json eventJson;
+    
+    for (size_t i = 0; i < eventMap.size(); i++) {
+        const std::pair<std::pair<std::string, double>, int>& event = eventMap[i];
+        json eventItem;
+        eventItem["stream_id"] = event.second;
+        eventItem["event_name"] = event.first.first;
+        eventItem["event_timestamp"] = event.first.second;
+        eventJson.push_back(eventItem);
+    }
+
+    root["events"] = eventJson;
 
     std::string serialized_data = root.dump();
     char* cstr = new char[serialized_data.length() + 1];
